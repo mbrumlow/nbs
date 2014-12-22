@@ -1,0 +1,51 @@
+
+ABOUT
+
+This is my quick attempt to make a EBS like driver for linux. 
+
+In its current state it is missing a few things. 
+    1) A sane way to configure the driver. 
+    2) Redundacy. 
+    3) Error handling.
+    
+If you are reading this you are looking about 6 or 7 hours worth of work.
+So I expect there to be some problems, but not anything that can't be fixed. 
+
+
+INSALL 
+
+"make all" will build both the kernel module and the c user space server. 
+Values are currently hardcoded at 1 gigabyte for the disk size. Module expects 
+to connect to the server via 127.0.0.1 on port 1337. The backing file is 
+stored in '/tmp/blockdev.img', so make sure you have 1 gigabyte avalable there 
+or change the code in server.c 
+
+You should start the server first, although starting the module first will not 
+harm your system, it will just generate IO errors forever untill you unload 
+and load it with the server started first. 
+
+
+TODO
+
+    1) Make network fault talerant. 
+    2) Have the server connect to the kernel and setup the block device. 
+       This is mostly because any good use case you will not want to have 
+       to loginto this server directly to attach a block device. It also allows
+       for the bulk of the confifiration mangement outside of the kernel. 
+    3) To minimize the work on the kernel module its self I think the connected
+       server should handle fanout for redundancy. This would keep the module 
+       simple alowing the bulk of the redundancy logic to live in user space. 
+       Also provides ways to change the redundancy without needing to load a 
+       new module. 
+    4) As said above, handle ERRORS, IO errors on the backing device do not 
+       currently make their way back up to the module. Although this is #4 in
+       list I will likely work to fix that first. 
+
+NOTE
+    
+    I compiled and tested on 3.11.0-12-generic. Due to the kernel changing
+    frequently it may need some tweaks to run on older or newer kernels. 
+
+
+
+
